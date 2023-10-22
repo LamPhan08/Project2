@@ -43,6 +43,8 @@ const Header = () => {
             <img src={userIcon} alt="" />
           </div>
 
+          <h5>Hi Username!</h5>
+
           <div className="btn_zone">
             <LogoutIcon />
 
