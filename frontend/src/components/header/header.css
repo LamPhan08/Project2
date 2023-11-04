@@ -21,7 +21,7 @@
 
 .logo_container >span {
     font-size: 20px;
-    color: #444746;
+    color: #7dc2f0;
     font-weight: 500;
     margin-left: 16px;
 }
@@ -69,6 +69,7 @@
     border-radius: 16px;
     margin: 7px;
     cursor: pointer;
+    gap: 10px
 }
 
 .avatarContainer:hover {

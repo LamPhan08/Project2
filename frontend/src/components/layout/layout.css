@@ -1,0 +1,10 @@
+.main_container {
+    display: flex;
+    /* height: 100%; */
+    /* background-color: green; */
+}
+
+.main_content {
+    margin-left: 250px;
+    width: 100%;
+}

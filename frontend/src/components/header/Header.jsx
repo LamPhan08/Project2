@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './header.css'
 import userIcon from '../../assets/images/user.png'
-import driveIcon from '../../assets/images/Drive.png'
+import logo from '../../assets/images/Reporto-Logo.png'
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -15,16 +15,16 @@ const Header = () => {
   return (
     <div className="header">
       <div className="logo_container">
-        <img src={driveIcon} alt="" />
+        <img src={logo} alt="" />
 
-        <span>Drive</span>
+        <span>Reporto</span>
       </div>
 
       <div className="searchBarContainer">
         <div className="searchBar">
           <SearchIcon className='icon' />
 
-          <input type="text" placeholder='Search in Drive' />
+          <input type="text" placeholder='Search in Reporto...' />
         </div>
       </div>
 
