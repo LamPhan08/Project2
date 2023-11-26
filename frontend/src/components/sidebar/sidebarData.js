@@ -4,13 +4,13 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 export const SidebarData = [
     {
         title: "My Storage",
-        path: "/dashboard/mystorage",
+        path: "/mystorage",
         icon: InsertDriveFileIcon
     },
 
     {
         title: "Trash",
-        path: "/dashboard/trash",
+        path: "/trash",
         icon: DeleteOutlineIcon
     }
 ] 

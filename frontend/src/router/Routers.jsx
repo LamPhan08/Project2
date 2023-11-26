@@ -6,9 +6,10 @@ import {Routes, Route, Navigate} from 'react-router-dom'
 const Routers = () => {
   return (
     <Routes>
-      <Route path='/' element={<Navigate to='/dashboard/mystorage'/>}/>
-      <Route path='/dashboard/mystorage' element={<MyStorage/>}/>
-      <Route path='/dashboard/trash' element={<Trash/>}/>
+      <Route path='/' element={<Navigate to='/mystorage'/>}/>
+      <Route path='/mystorage' element={<MyStorage/>}/>
+      <Route path='/mystorage/folder/:folderId' element={<MyStorage/>}/>
+      <Route path='/trash' element={<Trash/>}/>
     </Routes>
   )
 }
