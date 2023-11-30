@@ -3,7 +3,6 @@ import FolderIcon from '@mui/icons-material/Folder';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import './folder.css'
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 const Folder = ({ folder }) => {
   const navigate = useNavigate()

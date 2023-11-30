@@ -4,12 +4,24 @@ import userIcon from '../../assets/images/user.png'
 import logo from '../../assets/images/Reporto-Logo.png'
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false)
+  const {currentUser, logout} = useAuth()
+  const navigate = useNavigate()
+
+  console.log(currentUser)
 
   const handleOpenMenu = () => {
     setOpenMenu(!openMenu)
+  }
+
+  const handleLogout = async () => {
+    await logout()
+
+    navigate('/login')
   }
 
   return (
@@ -38,14 +50,14 @@ const Header = () => {
 
       <div className={`dropdown_menu ${openMenu ? 'active' : 'inactive'}`}>
           <div className='user_in4_container'>
-            <h6>example@gmail.com</h6>
+            <h6>{currentUser.email}</h6>
 
             <img src={userIcon} alt="" />
           </div>
 
-          <h5>Hi Username!</h5>
+          <h5>Hello!</h5>
 
-          <div className="btn_zone">
+          <div className="btn_zone" onClick={handleLogout}>
             <LogoutIcon />
 
             <span>Logout</span>

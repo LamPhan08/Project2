@@ -5,7 +5,7 @@
     display: flex;
     gap: 12px;
     text-decoration: none;
-    width: 19.2%;
+    width: 15.83333%;
     align-items: center;
     color: #000;
     font-weight: 500;
@@ -29,6 +29,7 @@
     overflow-wrap: break-word;
     text-overflow: ellipsis;
     flex: 1;
+    user-select: none;
 }
 
 .moreBtn {

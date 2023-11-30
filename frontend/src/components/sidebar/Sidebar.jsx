@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ReactDOM from 'react-dom';
 import './sidebar.css'
 import AddIcon from '@mui/icons-material/Add';
 import { SidebarData } from './sidebarData';
@@ -7,10 +8,12 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { NavLink } from 'react-router-dom';
-import { database } from '../../firebase/firebase';
+import { database, storage } from '../../firebase/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import {useSelector} from 'react-redux'
+import { useSelector } from 'react-redux'
 import { ROOT_FOLDER } from '../../hooks/useFolder';
+import { v4 as uuidV4 } from 'uuid'
+import { Toast, ProgressBar } from 'react-bootstrap'
 
 const menuItem = [
     {
@@ -34,11 +37,14 @@ const menuItem = [
 const Sidebar = () => {
     //State
     const [openMenu, setOpenMenu] = useState(false)
+    const [uploadingFiles, setUploadingFiles] = useState([])
     const [nameFolder, setNameFolder] = useState(false)
     const [name, setName] = useState('')
-    const {currentUser} = useAuth()
+    const { currentUser } = useAuth()
 
-    const {currentFolderId, currentFolder} = useSelector(state => state.currentFolder)
+    const { currentFolderId, currentFolder } = useSelector(state => state.currentFolder)
+
+    // console.log('currentFolder:', currentFolder)
 
     const handleOpenMenu = () => {
         setOpenMenu(!openMenu)
@@ -49,19 +55,97 @@ const Sidebar = () => {
         setOpenMenu(!openMenu)
     }
 
-    const handleUploadFile = () => {
-        console.log('click')
+    const handleUpload = (e) => {
+        const file = e.target.files[0]
+
+        console.log(file)
+
+        if (currentFolder === null || file === null) {
+            return
+        }
+
+        const id = uuidV4()
+
+        setUploadingFiles(prevUploadingFiles => [
+            ...prevUploadingFiles,
+            { id: id, name: file.name, progress: 0, error: false }
+        ])
+
+        const filePath = currentFolder === ROOT_FOLDER
+            ? `${currentFolder.path.join("/")}/${file.name}`
+            : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
+
+        const uploadTask = storage
+            .ref(`/files/${currentUser.uid}/${filePath}`)
+            .put(file)
+
+        uploadTask.on(
+            "state_changed",
+            snapshot => {
+                const progress = snapshot.bytesTransferred / snapshot.totalBytes
+                setUploadingFiles(prevUploadingFiles => {
+                    return prevUploadingFiles.map(uploadFile => {
+                        if (uploadFile.id === id) {
+                            return { ...uploadFile, progress: progress }
+                        }
+
+                        return uploadFile
+                    })
+                })
+            },
+            () => {
+                setUploadingFiles(prevUploadingFiles => {
+                    return prevUploadingFiles.map(uploadFile => {
+                        if (uploadFile.id === id) {
+                            return { ...uploadFile, error: true }
+                        }
+                        return uploadFile
+                    })
+                })
+            },
+            () => {
+                setUploadingFiles(prevUploadingFiles => {
+                    return prevUploadingFiles.filter(uploadFile => {
+                        return uploadFile.id !== id
+                    })
+                })
+
+                uploadTask.snapshot.ref.getDownloadURL().then(url => {
+                    database.files
+                        .where("name", "==", file.name)
+                        .where("userId", "==", currentUser.uid)
+                        .where("folderId", "==", currentFolder.id)
+                        .get()
+                        .then(existingFiles => {
+                            const existingFile = existingFiles.docs[0]
+                            if (existingFile) {
+                                existingFile.ref.update({ url: url })
+                            } else {
+                                database.files.add({
+                                    url: url,
+                                    name: file.name,
+                                    createdAt: database.getCurrentTimestamp(),
+                                    folderId: currentFolder.id,
+                                    userId: currentUser.uid,
+                                })
+                            }
+                        })
+                })
+            }
+        )
+
+        setOpenMenu(!openMenu)
     }
 
     const handleCreateFolder = () => {
-        if (currentFolderId === null) {
+        if (currentFolder === null) {
             return
         }//
 
         const path = [...currentFolder.path]
 
         if (currentFolder !== ROOT_FOLDER) {
-            path.push({name: currentFolder.name, id: currentFolder.id})
+            path.push({ name: currentFolder.name, id: currentFolder.id })
         }
 
         database.folders.add({
@@ -84,9 +168,19 @@ const Sidebar = () => {
             <div className={`new_dropdown_menu ${openMenu ? 'active' : 'inactive'}`}>
                 {menuItem.map((item, index) => {
                     return (
-                        <div className='menu_item' onClick={item.title === 'New Folder' ? handleNameFolder : (item.title === 'Upload File' ? handleUploadFile : null)} key={index}>
-                            <item.icon />
-                            {item.title}
+                        <div onClick={item.title === 'New Folder' ? handleNameFolder : null} key={index}>
+
+                            {item.title === 'Upload File' || item.title === 'Upload Folder'
+                                ? <div className='menu_item' >
+                                    <item.icon />
+                                    <label className='chooseFileBtn' htmlFor='file' style={{ cursor: 'pointer' }}>{item.title}</label>
+                                    <input type="file" id="file" style={{ display: "none" }} onChange={handleUpload} />
+                                </div>
+                                : <div className='menu_item' >
+                                    <item.icon />
+                                    {item.title}
+                                </div>
+                            }
                         </div>
                     )
                 })}
@@ -132,6 +226,51 @@ const Sidebar = () => {
                     </div>
                 </div>
             }
+
+            {uploadingFiles.length > 0 &&
+                ReactDOM.createPortal(
+                    <div
+                        style={{
+                            position: "absolute",
+                            bottom: "1rem",
+                            right: "1rem",
+                            maxWidth: "250px",
+                        }}
+                    >
+                        {uploadingFiles.map(file => (
+                            <Toast
+                                key={file.id}
+                                onClose={() => {
+                                    setUploadingFiles(prevUploadingFiles => {
+                                        return prevUploadingFiles.filter(uploadFile => {
+                                            return uploadFile.id !== file.id
+                                        })
+                                    })
+                                }}
+                            >
+                                <Toast.Header
+                                    closeButton={file.error}
+                                    className="text-truncate w-100 d-block"
+                                >
+                                    {file.name}
+                                </Toast.Header>
+                                <Toast.Body>
+                                    <ProgressBar
+                                        animated={!file.error}
+                                        variant={file.error ? "danger" : "primary"}
+                                        now={file.error ? 100 : file.progress * 100}
+                                        label={
+                                            file.error
+                                                ? "Error"
+                                                : `${Math.round(file.progress * 100)}%`
+                                        }
+                                    />
+                                </Toast.Body>
+                            </Toast>
+                        ))}
+                    </div>,
+                    document.body
+                )}
         </div>
     )
 }

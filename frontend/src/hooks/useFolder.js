@@ -31,13 +31,19 @@ const reducer = (state, { type, payload }) => {
                 childFolders: payload.childFolders
             }
         }
+        case ACTIONS.SET_CHILD_FILES: {
+            return {
+                ...state,
+                childFiles: payload.childFiles
+            }
+        }
         default: {
             return state
         }
     }
 }
 
-export const ROOT_FOLDER = { name: "Root", id: null, path: [] }
+export const ROOT_FOLDER = { name: "My Storage", id: null, path: [] }
 
 export const useFolder = (folderId = null, folder = null) => {
     const [state, dispatch] = useReducer(reducer, {
@@ -84,18 +90,31 @@ export const useFolder = (folderId = null, folder = null) => {
 
     useEffect(() => {
         return database.folders
-        .where("parentId", "==", folderId)
-        .where("userId", "==", currentUser.uid)
-        .orderBy("createdAt")
-        .onSnapshot(snapshot => {
+          .where("parentId", "==", folderId)
+          .where("userId", "==", currentUser.uid)
+          .orderBy("createdAt")
+          .onSnapshot(snapshot => {
             dispatch({
-                type: ACTIONS.SET_CHILD_FOLDERS,
-                payload: {
-                    childFolders: snapshot.docs.map(database.formatDoc)
-                } 
+              type: ACTIONS.SET_CHILD_FOLDERS,
+              payload: { childFolders: snapshot.docs.map(database.formatDoc) },
             })
-        })
-    }, [folderId, currentUser])
+          })
+      }, [folderId, currentUser])
+    
+      useEffect(() => {
+        return (
+          database.files
+            .where("folderId", "==", folderId)
+            .where("userId", "==", currentUser.uid)
+            .orderBy("createdAt")
+            .onSnapshot(snapshot => {
+              dispatch({
+                type: ACTIONS.SET_CHILD_FILES,
+                payload: { childFiles: snapshot.docs.map(database.formatDoc) },
+              })
+            })
+        )
+      }, [folderId, currentUser])
 
     return state
 }

@@ -1,0 +1,10 @@
+.signupBtn {
+    background-color: #89c6ee;
+    border: none;
+    margin-top: 30px;
+}
+
+.signupBtn:hover {
+    background-color: #61b5ec;
+    transition: 0.3s;
+}
