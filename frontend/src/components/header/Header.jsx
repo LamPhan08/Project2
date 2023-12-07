@@ -6,13 +6,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false)
   const {currentUser, logout} = useAuth()
   const navigate = useNavigate()
-
-  console.log(currentUser)
+  const {pathname} = useLocation()
 
   const handleOpenMenu = () => {
     setOpenMenu(!openMenu)
@@ -26,24 +26,24 @@ const Header = () => {
 
   return (
     <div className="header">
-      <div className="logo_container">
+      <div className="logo_container" onClick={() => navigate('/')}>
         <img src={logo} alt="" />
 
         <span>Reporto</span>
       </div>
 
-      <div className="searchBarContainer">
+      {pathname !== '/text-editor' && <div className="searchBarContainer">
         <div className="searchBar">
           <SearchIcon className='icon' />
 
           <input type="text" placeholder='Search in Reporto...' />
         </div>
-      </div>
+      </div>}
 
       <div className="avatarContainer" onClick={() => handleOpenMenu()}>
         <img src={userIcon} alt="" />
 
-        <span>Username</span>
+        <span className='email'>{currentUser.email}</span>
 
 
       </div>

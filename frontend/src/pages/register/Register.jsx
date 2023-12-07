@@ -8,7 +8,7 @@ const Register = () => {
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
-  const { signup } = useAuth()
+  const { signUp } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -22,11 +22,9 @@ const Register = () => {
     }
 
     try {
-      console.log(emailRef.current.value)
-      console.log(passwordRef.current.value)
       setError("")
       setLoading(true)
-      await signup(emailRef.current.value, passwordRef.current.value)
+      await signUp(emailRef.current.value, passwordRef.current.value)
       navigate("/mystorage")
     } catch {
       setError("Failed to create an account!")

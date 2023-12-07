@@ -40,7 +40,7 @@ const MyStorage = () => {
           ))}
         </div>}
 
-      {childFolders.length > 0 && childFiles.length > 0 && <hr />}
+      {childFolders.length > 0 && childFiles.length > 0 && <hr style={{color: 'red'}}/>}
 
       {childFiles.length > 0 && <span className='title'>Files</span>}
 

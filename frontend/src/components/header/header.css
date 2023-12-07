@@ -3,6 +3,10 @@
     height: 60px;
     display: flex;
     width: 100vw;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
 }
 
 
@@ -11,7 +15,8 @@
     align-items: center;
     justify-content: flex-start;
     width: 250px;
-    padding: 12px
+    padding: 12px;
+    cursor: pointer;
 }
 
 .logo_container > img {
@@ -150,4 +155,8 @@
 .btn_zone span {
     margin-left: 10px;
     font-weight: 500;
+}
+
+.email {
+    user-select: none;
 }

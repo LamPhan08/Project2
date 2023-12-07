@@ -23,6 +23,7 @@
     display: flex;
     gap: 8px;
     cursor: pointer;
+    user-select: none;
 }
 
 .newBtnContainer:hover {
@@ -75,6 +76,7 @@
 
 .sidebar_item_container {
     margin-top: 10%;
+    user-select: none;
 }
 
 .inactive_sidebar_item {
@@ -150,7 +152,6 @@
 }
 
 .input_container {
-    margin-bottom: 70px;
     border: #ddd 1px solid;
     border-radius: 5px;
 }
@@ -178,4 +179,11 @@
 
 .nameFolderBtn:hover {
     background-color: #96d4fd;
+}
+
+.fileNameExists {
+    color: red;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 60px;
 }

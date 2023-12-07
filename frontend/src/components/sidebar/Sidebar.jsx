@@ -28,10 +28,10 @@ const menuItem = [
         title: "Upload File",
         icon: UploadFileIcon
     },
-    {
-        title: "Upload Folder",
-        icon: DriveFolderUploadIcon
-    },
+    // {
+    //     title: "Upload Folder",
+    //     icon: DriveFolderUploadIcon
+    // },
 ]
 
 const Sidebar = () => {
@@ -39,6 +39,8 @@ const Sidebar = () => {
     const [openMenu, setOpenMenu] = useState(false)
     const [uploadingFiles, setUploadingFiles] = useState([])
     const [nameFolder, setNameFolder] = useState(false)
+    const [nameFile, setNameFile] = useState(false)
+    const [showExistingName, setShowExistingName] = useState(false)
     const [name, setName] = useState('')
     const { currentUser } = useAuth()
 
@@ -52,6 +54,11 @@ const Sidebar = () => {
 
     const handleNameFolder = () => {
         setNameFolder(true)
+        setOpenMenu(!openMenu)
+    }
+
+    const handleNameFile = () => {
+        setNameFile(true)
         setOpenMenu(!openMenu)
     }
 
@@ -78,6 +85,7 @@ const Sidebar = () => {
         const uploadTask = storage
             .ref(`/files/${currentUser.uid}/${filePath}`)
             .put(file)
+
 
         uploadTask.on(
             "state_changed",
@@ -124,7 +132,9 @@ const Sidebar = () => {
                                 database.files.add({
                                     url: url,
                                     name: file.name,
+                                    type: file.type,
                                     createdAt: database.getCurrentTimestamp(),
+                                    modifiedDate: database.getCurrentTimestamp(),
                                     folderId: currentFolder.id,
                                     userId: currentUser.uid,
                                 })
@@ -157,6 +167,96 @@ const Sidebar = () => {
         })
     }
 
+    const handleCreateDocFile = () => {
+        if (currentFolder === null) {
+            return
+        }
+
+        const content = ""
+
+        const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+        const file = new File([blob], `${name}.docx`, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+
+        // database.files
+        //     .where("name", "==", name)
+        //     .where("userId", "==", currentUser.uid)
+        //     .where("folderId", "==", currentFolder.id)
+        //     .get()
+        //     .then(existingFiles => {
+        //         const existingFile = existingFiles.docs[0]
+
+        //         if (existingFile) {
+        //             setShowExistingName(true)
+        //         }
+        //         else {
+        //             database.files.add({
+        //                 url: null,
+        //                 name: name,
+        //                 type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        //                 createdAt: database.getCurrentTimestamp(),
+        //                 modifiedDate: database.getCurrentTimestamp(),
+        //                 folderId: currentFolder.id,
+        //                 userId: currentUser.uid
+        //             })
+
+        // setShowExistingName(false)
+        // setName('')
+        // setNameFile(false)
+
+        //         }
+        //     })
+
+        const filePath = currentFolder === ROOT_FOLDER
+            ? `${currentFolder.path.join("/")}/${file.name}`
+            : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
+
+        const uploadTask = storage
+            .ref(`/files/${currentUser.uid}/${filePath}`)
+            .put(file)
+
+
+        uploadTask.on(
+            "state_changed",
+            () => {
+
+            },
+            () => {
+
+            },
+            () => {
+                uploadTask.snapshot.ref.getDownloadURL().then(url => {
+                    database.files
+                        .where("name", "==", file.name)
+                        .where("userId", "==", currentUser.uid)
+                        .where("folderId", "==", currentFolder.id)
+                        .get()
+                        .then(existingFiles => {
+                            const existingFile = existingFiles.docs[0]
+                            if (existingFile) {
+                                // existingFile.ref.update({ url: url })
+                                setShowExistingName(true)
+                            } else {
+                                database.files.add({
+                                    url: url,
+                                    name: name,
+                                    type: file.type,
+                                    createdAt: database.getCurrentTimestamp(),
+                                    modifiedDate: database.getCurrentTimestamp(),
+                                    folderId: currentFolder.id,
+                                    userId: currentUser.uid,
+                                })
+
+                                setShowExistingName(false)
+                                setName('')
+                                setNameFile(false)
+                            }
+                        })
+                })
+            }
+        )
+    }
+
     return (
         <div className='sidebar_container'>
             <div className="newBtnContainer" onClick={handleOpenMenu}>
@@ -168,9 +268,9 @@ const Sidebar = () => {
             <div className={`new_dropdown_menu ${openMenu ? 'active' : 'inactive'}`}>
                 {menuItem.map((item, index) => {
                     return (
-                        <div onClick={item.title === 'New Folder' ? handleNameFolder : null} key={index}>
+                        <div onClick={item.title === 'New Folder' ? handleNameFolder : (item.title === 'New Doc File' ? handleNameFile : null)} key={index}>
 
-                            {item.title === 'Upload File' || item.title === 'Upload Folder'
+                            {item.title === 'Upload File'
                                 ? <div className='menu_item' >
                                     <item.icon />
                                     <label className='chooseFileBtn' htmlFor='file' style={{ cursor: 'pointer' }}>{item.title}</label>
@@ -219,6 +319,37 @@ const Sidebar = () => {
                                 handleCreateFolder()
                                 setName('')
                                 setNameFolder(false)
+                            }}>
+                                Create
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            {nameFile &&
+                <div className="nameFolderPopup">
+                    {/* <span onClick={() => {setNameFolder(false)}}>&times;</span> */}
+
+                    <div className="nameFolderForm">
+                        <div className='newFolderText'>New Doc File</div>
+
+                        <div className='input_container'>
+                            <input type='text' className='input' placeholder='Type new name...' onChange={e => setName(e.target.value)} />
+                        </div>
+
+                        <div className='fileNameExists'>{showExistingName ? "File name already exists!" : " "}</div>
+                        {/* {showExistingName && <div className='fileNameExists'>File name already exists!</div>} */}
+
+                        <div className='newFolderBtnZone'>
+                            <button className='nameFolderBtn' onClick={() => {
+                                setName('')
+                                setNameFile(false)
+                            }}>Cancel
+                            </button>
+
+                            <button className='nameFolderBtn' onClick={() => {
+                                handleCreateDocFile()
                             }}>
                                 Create
                             </button>
