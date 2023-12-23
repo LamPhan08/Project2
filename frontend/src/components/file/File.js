@@ -10,6 +10,7 @@ import pdf from '../../assets/images/pdf.png'
 import image from '../../assets/images/image.png'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {useNavigate} from 'react-router-dom'
+import mammoth from 'mammoth'
 
 const File = ({ file }) => {
   const navigate = useNavigate()
