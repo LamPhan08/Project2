@@ -1,0 +1,83 @@
+.folderBtn {
+    background-color: #edf2fc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    text-decoration: none;
+    align-items: center;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 15px;
+    /* position: relative; */
+}
+
+.folderBtn:hover {
+    background-color: #c2e7ff;
+    transition: 0.3s;
+    color: #000;
+}
+
+.icon {
+    color: #1a1a1a;
+}
+
+.folderName {
+    white-space: nowrap;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    text-overflow: ellipsis;
+    flex: 1;
+    user-select: none;
+}
+
+.moreBtn {
+    cursor: pointer;
+    border-radius: 50px;
+    align-items: center;
+    justify-content: center;
+}
+
+.moreBtn:hover {
+    background-color: #c9c9c9;
+    transition: 0.3s;
+}
+
+.menu {
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    align-items: center;
+    /* justify-content: center; */
+    display: flex;
+    gap: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    cursor: pointer;
+    margin-top: 5px;
+    font-weight: 500;
+    font-size: 15px;
+
+}
+
+.menu:hover {
+    background-color: #c2e7ff;
+}
+
+.menuActive {
+    opacity: 1;
+    visibility: visible;
+    transition: 0.2s;
+    transform: translateY(-0);
+}
+
+
+.menuInactive {
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s;
+    transform: translateY(-20px);
+}

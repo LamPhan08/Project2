@@ -1,0 +1,23 @@
+.myStorageContainer {
+    /* background-color: red; */
+    padding: 20px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.nothingWrapper {
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
+    padding-top: 100px;
+}
+
+.nothingImg {
+    height: 320px;
+    width: 320px;
+}
