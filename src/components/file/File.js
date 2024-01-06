@@ -37,7 +37,7 @@ const File = ({ file }) => {
       }
 
       case 'image/jpeg': {
-        return <img alt='' src={file.url} className={`${className} image`} />
+        return <img alt='' src={file.url} className={`${className} image`}/>
       }
 
       case 'text/plain': {

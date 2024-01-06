@@ -64,3 +64,21 @@
     pointer-events: none;
     cursor: none;
 }
+
+
+.templateImg {
+    width: 300px;
+    height: 500px;
+    object-fit: cover;
+}
+
+.closeBtn {
+    font-size: 40px;
+    cursor: pointer;
+    text-align: end;
+}
+
+.radiobtn {
+    display: none;
+}
+
