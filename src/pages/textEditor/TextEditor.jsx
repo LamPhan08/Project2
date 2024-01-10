@@ -15,6 +15,11 @@ import ttdn from '../../assets/images/ttdn.png'
 import kltn from '../../assets/images/kltn.png'
 import Modal from 'react-modal'
 import { Button } from 'react-bootstrap';
+import { database, storage } from '../../firebase/firebase';
+import { useSelector } from 'react-redux'
+import { useAuth } from '../../contexts/AuthContext';
+import { ROOT_FOLDER } from '../../hooks/useFolder';
+
 
 const buttons = [
   "undo",
@@ -61,7 +66,7 @@ const editorConfig = {
   askBeforePasteHTML: true,
   askBeforePasteFromWord: true,
   //defaultActionOnPaste: "insert_clear_html",
-  // buttons: buttons,
+  // buttons: buttons,  
   autofocus: true,
   uploader: {
     insertImageAsBase64URI: true
@@ -100,6 +105,8 @@ const customStyles = {
 
 
 const TextEditor = () => {
+  const { currentFolderId, currentFolder } = useSelector(state => state.currentFolder)
+  const { currentUser } = useAuth()
   const { state } = useLocation()
   const [data, setData] = useState('');
   const [initialRender, setInitialRender] = useState(true)
@@ -108,6 +115,52 @@ const TextEditor = () => {
   const [templateValue, setTemplateValue] = useState(null)
 
   const handleSave = () => {
+    if (currentFolder === null) {
+      return
+    }
+
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+    const file = new File([blob], `${state.name}.docx`, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+
+    const filePath = currentFolder === ROOT_FOLDER
+      ? `${currentFolder.path.join("/")}/${file.name}`
+      : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
+
+    const uploadTask = storage
+      .ref(`/files/${currentUser.uid}/${filePath}`)
+      .put(file)
+
+
+    uploadTask.on(
+      "state_changed",
+      () => {
+
+      },
+      () => {
+
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(url => {
+          database.files
+            .where("name", "==", state.name)
+            .where("userId", "==", currentUser.uid)
+            .where("folderId", "==", currentFolder.id)
+            .get()
+            .then(existingFiles => {
+              const existingFile = existingFiles.docs[0]
+
+              if (existingFile) {
+                existingFile.ref.update({ url: url })
+              } else {
+                console.log('unsaved')
+              }
+            })
+        })
+      }
+    )
+
+
     setIsChanged(false)
   }
 
@@ -254,7 +307,7 @@ const TextEditor = () => {
                 <img src={template} alt='' className='templateImg' />
               </label>
 
-              <div style={{textAlign: 'center', fontWeight: 500}}>Self Assessment Report</div>
+              <div style={{ textAlign: 'center', fontWeight: 500 }}>Self Assessment Report</div>
             </div>
 
             <div>
@@ -270,7 +323,7 @@ const TextEditor = () => {
                 <img src={ttdn} alt='' className='templateImg' />
               </label>
 
-              <div style={{textAlign: 'center', fontWeight: 500}}>Corporate Internship Report</div>
+              <div style={{ textAlign: 'center', fontWeight: 500 }}>Corporate Internship Report</div>
             </div>
 
             <div>
@@ -286,7 +339,7 @@ const TextEditor = () => {
                 <img src={kltn} alt='' className='templateImg' />
               </label>
 
-              <div style={{textAlign: 'center', fontWeight: 500}}>Graduation Thesis Report</div>
+              <div style={{ textAlign: 'center', fontWeight: 500 }}>Graduation Thesis Report</div>
             </div>
           </div>
 
