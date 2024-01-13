@@ -7,6 +7,8 @@ const ACTIONS = {
     UPDATE_FOLDER: "update-folder",
     SET_CHILD_FOLDERS: "set-child-folders",
     SET_CHILD_FILES: "set-child-files",
+    SET_REMOVED_FILES: "set-removed-files",
+    SET_REMOVED_FOLDERS: "set-removed-folders",
 }
 
 const reducer = (state, { type, payload }) => {
@@ -37,6 +39,18 @@ const reducer = (state, { type, payload }) => {
                 childFiles: payload.childFiles
             }
         }
+        case ACTIONS.SET_REMOVED_FILES: {
+            return {
+                ...state,
+                removedFiles: payload.removedFiles
+            }
+        }
+        case ACTIONS.SET_REMOVED_FOLDERS: {
+            return {
+                ...state,
+                removedFolders: payload.removedFolders
+            }
+        }
         default: {
             return state
         }
@@ -50,7 +64,9 @@ export const useFolder = (folderId = null, folder = null) => {
         folderId,
         folder,
         childFolders: [],
-        childFiles: []
+        childFiles: [],
+        removedFolders: [],
+        removedFiles: [],
     })
 
     const {currentUser} = useAuth()
@@ -115,6 +131,30 @@ export const useFolder = (folderId = null, folder = null) => {
             })
         )
       }, [folderId, currentUser])
+      useEffect(() => {
+        return database.removedFolders
+          .where("userId", "==", currentUser.uid)
+          .orderBy("createdAt")
+          .onSnapshot(snapshot => {
+            dispatch({
+              type: ACTIONS.SET_REMOVED_FOLDERS,
+              payload: { removedFolders: snapshot.docs.map(database.formatDoc) },
+            })
+          })
+      }, [currentUser])
+      useEffect(() => {
+        return (
+          database.removedFiles
+            .where("userId", "==", currentUser.uid)
+            .orderBy("createdAt")
+            .onSnapshot(snapshot => {
+              dispatch({
+                type: ACTIONS.SET_REMOVED_FILES,
+                payload: { removedFiles: snapshot.docs.map(database.formatDoc) },
+              })
+            })
+        )
+      }, [currentUser])
 
     return state
 }

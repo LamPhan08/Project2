@@ -44,28 +44,24 @@
     transition: 0.3s;
 }
 
-.menu {
+.folderMenu {
     position: absolute;
-    right: 0;
     background-color: #fff;
     align-items: center;
-    /* justify-content: center; */
+    right: 0;
+    /* bottom: 0; */
     display: flex;
-    gap: 10px;
-    padding: 5px 10px;
+    flex-direction: column;
+    /* gap: 10px; */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     user-select: none;
     cursor: pointer;
-    margin-top: 5px;
+    /* margin-top: 5px; */
     font-weight: 500;
     font-size: 15px;
-    z-index: 100;
 }
 
-.menu:hover {
-    background-color: #c2e7ff;
-}
 
 .menuActive {
     opacity: 1;
@@ -81,3 +77,4 @@
     transition: 0.2s;
     transform: translateY(-20px);
 }
+

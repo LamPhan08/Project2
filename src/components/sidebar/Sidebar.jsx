@@ -152,7 +152,7 @@ const Sidebar = () => {
                         .then(existingFiles => {
                             const existingFile = existingFiles.docs[0]
                             if (existingFile) {
-                                existingFile.ref.update({ url: url })
+                                existingFile.ref.update({ url: url, upload: true })
                             } else {
                                 database.files.add({
                                     url: url,

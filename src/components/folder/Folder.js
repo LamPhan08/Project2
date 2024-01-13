@@ -28,7 +28,8 @@ const Folder = ({ folder }) => {
       .catch((error) => {
         console.error('Error removing document: ', error);
       });
-
+    
+    database.removedFolders.add(folder)
     
   }
 

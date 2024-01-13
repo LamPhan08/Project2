@@ -21,6 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ROOT_FOLDER } from '../../hooks/useFolder';
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
+
 const buttons = [
   "undo",
   "redo",
@@ -245,9 +246,31 @@ const TextEditor = () => {
     setInitialRender(false)
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (isChanged) {
       alert('Vui lòng nhấn lưu trước khi tải xuống!')
+    }
+    else {
+      try {
+        const response = await fetch(fileUrl)
+
+        const blob = await response.blob();
+
+        const blobUrl = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = state.name
+        
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+      }
+      catch (err) {
+        console.error('Error downloading file:', err);
+      } 
     }
   }
 

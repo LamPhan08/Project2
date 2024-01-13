@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import './file.css'
+import './removedFile.css'
 import fileImage from '../../assets/images/file.png'
 import mp3 from '../../assets/images/mp3.png'
 import powerpoint from '../../assets/images/powerpoint.png'
@@ -10,13 +10,9 @@ import pdf from '../../assets/images/pdf.png'
 import image from '../../assets/images/image.png'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { useNavigate } from 'react-router-dom'
-import { database } from '../../firebase/firebase';
+import RestoreIcon from '@mui/icons-material/Restore';
 
-const File = ({ file }) => {
-  const navigate = useNavigate()
-  const [viewImage, setViewImage] = useState(false)
+const RemovedFile = ({ file }) => {
   const [showMenu, setShowMenu] = useState(false)
 
   const getFileImage = (className) => {
@@ -42,7 +38,7 @@ const File = ({ file }) => {
       }
 
       case 'image/jpeg': {
-        return <img alt='' src={file.url} className={`${className} image`}/>
+        return <img alt='' src={file.url} className={`${className} image`} />
       }
 
       case 'text/plain': {
@@ -63,61 +59,17 @@ const File = ({ file }) => {
     }
   }
 
-  const handleOpenMoreMenu = (e) => {
-    e.stopPropagation();
-
+  const handleOpenMoreMenu = () => {
     setShowMenu(!showMenu)
   }
 
-  const handleViewImage = () => {
-    setViewImage(!viewImage)
-  }
+  const handleRestoreFile = () => {
 
-  const handleOpenTextFile = async () => {
-    navigate('/text-editor', { state: file })
   }
 
   const handleDeleteFile = () => {
-    database.files.doc(file.id).delete()
-      .then(() => {
-        console.log('Document successfully deleted!');
-      })
-      .catch((error) => {
-        console.error('Error removing document: ', error);
-      });
-    
-    database.removedFiles.add(file)
+
   }
-
-  const handleOpenLink = () => {
-    window.open(file.url, '_blank')
-  }
-
-  const handleDownloadFile = async () => {
-    try {
-      const response = await fetch(file.url)
-
-      const blob = await response.blob();
-
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = file.name
-      
-      document.body.appendChild(link);
-
-      link.click();
-
-      document.body.removeChild(link);
-    }
-    catch (err) {
-      console.error('Error downloading file:', err);
-    } 
-
-    setShowMenu(!showMenu)
-  }
-
 
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     || file.type === 'text/plain'
@@ -128,7 +80,7 @@ const File = ({ file }) => {
   ) {
     return (
       <div style={{ width: '19.2%', position: 'relative' }}>
-        <div className='fileContainer' onClick={(file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/gif') ? handleViewImage : handleOpenTextFile}>
+        <div className='fileContainer'>
           <div className='nameWrapper'>
             {(file.type === 'image/png'
               || file.type === 'image/jpeg'
@@ -149,25 +101,17 @@ const File = ({ file }) => {
           </div>
         </div>
 
-        {viewImage &&
-          <div className='popupImage'>
-            <span onClick={handleViewImage}>&times;</span>
-
-            <img src={file.url} alt="" />
-          </div>
-        }
-
         <div className={`fileMenu ${showMenu ? 'fileMenuActive' : 'fileMenuInactive'}`}>
-          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleDownloadFile}>
-            <FileDownloadIcon />
+          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleRestoreFile}>
+            <RestoreIcon />
 
-            Download File
+            Restore
           </div>
 
           <div className='menuItem' style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }} onClick={handleDeleteFile}>
-            <DeleteOutlineIcon />
+            <DeleteOutlineIcon style={{ padding: 0 }} />
 
-            Move to Trash
+            Delete
           </div>
         </div>
       </div>
@@ -176,7 +120,7 @@ const File = ({ file }) => {
   else {
     return (
       <div style={{ width: '19.2%', position: 'relative' }}>
-        <div className='fileContainer' onClick={handleOpenLink}>
+        <div className='fileContainer'>
           <div className='nameWrapper'>
             {file.type === 'image/png'
               ? <img src={image} className='fileIcon' alt='' />
@@ -195,16 +139,16 @@ const File = ({ file }) => {
         </div>
 
         <div className={`fileMenu ${showMenu ? 'fileMenuActive' : 'fileMenuInactive'}`}>
-          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleDownloadFile}>
-            <FileDownloadIcon />
+          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleRestoreFile}>
+            <RestoreIcon />
 
-            Download File
+            Restore
           </div>
 
           <div className='menuItem' style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }} onClick={handleDeleteFile}>
-            <DeleteOutlineIcon />
+            <DeleteOutlineIcon style={{ padding: 0 }} />
 
-            Move to Trash
+            Delete
           </div>
         </div>
       </div>
@@ -212,4 +156,4 @@ const File = ({ file }) => {
   }
 }
 
-export default File
+export default RemovedFile
