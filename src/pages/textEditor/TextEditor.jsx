@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './textEditor.css'
 import "jodit";
 import "jodit/build/jodit.min.css";
@@ -19,7 +19,7 @@ import { database, storage } from '../../firebase/firebase';
 import { useSelector } from 'react-redux'
 import { useAuth } from '../../contexts/AuthContext';
 import { ROOT_FOLDER } from '../../hooks/useFolder';
-
+import { Document, Packer, Paragraph, TextRun } from "docx";
 
 const buttons = [
   "undo",
@@ -109,60 +109,130 @@ const TextEditor = () => {
   const { currentUser } = useAuth()
   const { state } = useLocation()
   const [data, setData] = useState('');
+  const [fileUrl, setFileUrl] = useState(state.url)
   const [initialRender, setInitialRender] = useState(true)
   const [isChanged, setIsChanged] = useState(false)
   const [chooseTemplate, setChooseTemplate] = useState(false)
   const [templateValue, setTemplateValue] = useState(null)
+  const editorRef = useRef()
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (currentFolder === null) {
       return
     }
 
-    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    if (state.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || state.type === 'application/msword') {
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun(editorRef.current.value),
+                ],
+              }),
+            ],
+          },
+        ],
+      });
 
-    const file = new File([blob], `${state.name}.docx`, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      const fileData = await Packer.toBlob(doc)
 
-    const filePath = currentFolder === ROOT_FOLDER
-      ? `${currentFolder.path.join("/")}/${file.name}`
-      : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
+      const blob = new Blob([fileData], { type: state.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword' });
 
-    const uploadTask = storage
-      .ref(`/files/${currentUser.uid}/${filePath}`)
-      .put(file)
+      const file = new File([blob], `${state.name}${state.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? '.docx' : '.doc'}`, { type: state.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword' })
 
+      const filePath = currentFolder === ROOT_FOLDER
+        ? `${currentFolder.path.join("/")}/${file.name}`
+        : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
 
-    uploadTask.on(
-      "state_changed",
-      () => {
+      const uploadTask = storage
+        .ref(`/files/${currentUser.uid}/${filePath}`)
+        .put(file)
 
-      },
-      () => {
+      uploadTask.on(
+        "state_changed",
+        () => {
 
-      },
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then(url => {
-          database.files
-            .where("name", "==", state.name)
-            .where("userId", "==", currentUser.uid)
-            .where("folderId", "==", currentFolder.id)
-            .get()
-            .then(existingFiles => {
-              const existingFile = existingFiles.docs[0]
+        },
+        () => {
 
-              if (existingFile) {
-                existingFile.ref.update({ url: url })
-              } else {
-                console.log('unsaved')
-              }
-            })
-        })
-      }
-    )
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(url => {
+            database.files
+              .where("name", "==", state.name)
+              .where("userId", "==", currentUser.uid)
+              .where("folderId", "==", currentFolder.id)
+              .get()
+              .then(existingFiles => {
+                const existingFile = existingFiles.docs[0]
 
+                if (existingFile) {
+                  existingFile.ref.update({
+                    url: url,
+                    upload: false
+                  })
+                  setFileUrl(url)
+                } else {
+                  console.log('unsaved')
+                }
+              })
+          })
+        }
+      )
+
+    }
+    else {
+      const blob = new Blob([data], { type: 'text/plain' });
+
+      const file = new File([blob], `${state.name}.txt`, { type: 'text/plain' })
+
+      const filePath = currentFolder === ROOT_FOLDER
+        ? `${currentFolder.path.join("/")}/${file.name}`
+        : `${currentFolder.path.join("/")}/${currentFolder.name}/${file.name}`
+
+      const uploadTask = storage
+        .ref(`/files/${currentUser.uid}/${filePath}`)
+        .put(file)
+
+      uploadTask.on(
+        "state_changed",
+        () => {
+
+        },
+        () => {
+
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(url => {
+            database.files
+              .where("name", "==", state.name)
+              .where("userId", "==", currentUser.uid)
+              .where("folderId", "==", currentFolder.id)
+              .get()
+              .then(existingFiles => {
+                const existingFile = existingFiles.docs[0]
+
+                if (existingFile) {
+                  existingFile.ref.update({
+                    url: url,
+                    upload: false
+                  })
+                  setFileUrl(url)
+                } else {
+                  console.log('unsaved')
+                }
+              })
+          })
+        }
+      )
+    }
 
     setIsChanged(false)
   }
+
 
 
   const handleChange = (text) => {
@@ -220,13 +290,26 @@ const TextEditor = () => {
     else {
       axios.get(state.url, { responseType: 'arraybuffer' })
         .then(response => {
-          mammoth.convertToHtml({ arrayBuffer: response.data })
-            .then((result) => {
-              setData(result.value)
-            })
-            .catch((error) => {
-              console.error('Error extracting text from DOCX:', error);
-            });
+          console.log('response:', response.data)
+
+          if (state.upload === true) {
+            mammoth.convertToHtml({ arrayBuffer: response.data })
+              .then((result) => {
+                setData(result.value)
+              })
+              .catch((error) => {
+                console.error('Error extracting text from DOCX:', error);
+              });
+          }
+          else {
+            mammoth.extractRawText({ arrayBuffer: response.data })
+              .then((result) => {
+                setData(result.value)
+              })
+              .catch((error) => {
+                console.error('Error extracting text from DOCX:', error);
+              });
+          }
         })
     }
   }, [])
@@ -257,6 +340,7 @@ const TextEditor = () => {
       </div>
 
       <JoditEditor
+        ref={editorRef}
         value={data}
         config={editorConfig}
         onChange={value => handleChange(value)}

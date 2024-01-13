@@ -24,6 +24,10 @@ const File = ({ file }) => {
         return <img alt='' src={word} className={className} />
       }
 
+      case 'application/msword': {
+        return <img alt='' src={word} className={className} />
+      }
+
       case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': {
         return <img alt='' src={powerpoint} className={className} />
       }
@@ -87,6 +91,7 @@ const File = ({ file }) => {
 
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     || file.type === 'text/plain'
+    || file.type === 'application/msword'
     || file.type === 'image/png'
     || file.type === 'image/jpeg'
     || file.type === 'image/gif'

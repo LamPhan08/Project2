@@ -14,6 +14,7 @@ import { ROOT_FOLDER } from '../../hooks/useFolder';
 import { v4 as uuidV4 } from 'uuid'
 import { Toast, ProgressBar } from 'react-bootstrap'
 import mammoth from 'mammoth';
+import { Document, Packer, Paragraph, TextRun } from "docx";
 
 const menuItem = [
     {
@@ -161,6 +162,7 @@ const Sidebar = () => {
                                     modifiedDate: database.getCurrentTimestamp(),
                                     folderId: currentFolder.id,
                                     userId: currentUser.uid,
+                                    upload: true
                                 })
                             }
                         })
@@ -192,18 +194,35 @@ const Sidebar = () => {
         })
     }
 
-    const handleCreateDocFile = () => {
+    const handleCreateDocFile = async () => {
         if (currentFolder === null) {
             return
         }
 
         setLoadingCursor(true)
 
-        const content = ""
+        const content = "123456"
 
-        const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const doc = new Document({
+            sections: [
+                {
+                    properties: {},
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new TextRun(content),
+                            ],
+                        }),
+                    ],
+                },
+            ],
+        });
 
-        const file = new File([blob], `${name}.docx`, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+        const data = await Packer.toBlob(doc)
+
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }, );
+
+        const file = new File([blob], `${name}.docx`, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }, )
 
         const filePath = currentFolder === ROOT_FOLDER
             ? `${currentFolder.path.join("/")}/${file.name}`
@@ -247,6 +266,7 @@ const Sidebar = () => {
                                     modifiedDate: database.getCurrentTimestamp(),
                                     folderId: currentFolder.id,
                                     userId: currentUser.uid,
+                                    upload: false
                                 })
 
                                 navigate('text-editor', {state: {
@@ -257,7 +277,8 @@ const Sidebar = () => {
                                     createdAt: database.getCurrentTimestamp(),
                                     modifiedDate: database.getCurrentTimestamp(),
                                     folderId: currentFolder.id,
-                                    userId: currentUser.uid, 
+                                    userId: currentUser.uid,
+                                    upload: false
                                 }})
 
                                 setShowExistingName(false)
