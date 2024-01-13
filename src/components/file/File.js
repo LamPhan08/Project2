@@ -86,7 +86,16 @@ const File = ({ file }) => {
         console.error('Error removing document: ', error);
       });
     
-    database.removedFiles.add(file)
+    database.removedFiles.doc(file.id).set({
+      name: file.name,
+      type: file.type,
+      folderId: file.folderId,
+      createdAt: file.createdAt,
+      modifiedDate: file.modifiedDate,
+      upload: file.upload,
+      url: file.url,
+      userId: file.userId
+    })
   }
 
   const handleOpenLink = () => {

@@ -11,6 +11,7 @@ import image from '../../assets/images/image.png'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RestoreIcon from '@mui/icons-material/Restore';
+import { database } from '../../firebase/firebase'
 
 const RemovedFile = ({ file }) => {
   const [showMenu, setShowMenu] = useState(false)
@@ -64,11 +65,34 @@ const RemovedFile = ({ file }) => {
   }
 
   const handleRestoreFile = () => {
-
+    database.removedFiles.doc(file.id).delete()
+      .then(() => {
+        console.log('Document successfully deleted!');
+      })
+      .catch((error) => {
+        console.error('Error removing document: ', error);
+      });
+    
+    database.files.doc(file.id).set({
+      name: file.name,
+      type: file.type,
+      folderId: file.folderId,
+      createdAt: file.createdAt,
+      modifiedDate: file.modifiedDate,
+      upload: file.upload,
+      url: file.url,
+      userId: file.userId
+    })
   }
 
   const handleDeleteFile = () => {
-
+    database.removedFiles.doc(file.id).delete()
+      .then(() => {
+        console.log('Document successfully deleted!');
+      })
+      .catch((error) => {
+        console.error('Error removing document: ', error);
+      });
   }
 
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'

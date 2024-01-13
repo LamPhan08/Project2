@@ -29,7 +29,13 @@ const Folder = ({ folder }) => {
         console.error('Error removing document: ', error);
       });
     
-    database.removedFolders.add(folder)
+    database.removedFolders.doc(folder.id).set({
+      name: folder.name,
+      parentId: folder.parentId,
+      createdAt: folder.createdAt,
+      path: folder.path,
+      userId: folder.userId
+    })
     
   }
 
@@ -44,9 +50,6 @@ const Folder = ({ folder }) => {
         <div className='moreBtn' onClick={handleOpenMoreMenu}>
           <MoreVertIcon className='icon' />
         </div>
-
-
-
 
       </div>
 
