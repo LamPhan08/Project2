@@ -261,7 +261,7 @@ const TextEditor = () => {
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = state.name
-        
+
         document.body.appendChild(link);
 
         link.click();
@@ -270,7 +270,7 @@ const TextEditor = () => {
       }
       catch (err) {
         console.error('Error downloading file:', err);
-      } 
+      }
     }
   }
 
@@ -279,6 +279,47 @@ const TextEditor = () => {
   }
 
   const handleShowModal = () => {
+    setChooseTemplate(!chooseTemplate)
+  }
+
+  const handleSelectTemplate = () => {
+    if (templateValue === template) {
+      axios.get('https://firebasestorage.googleapis.com/v0/b/reportmanagementweb-409108.appspot.com/o/Software-Engineering-Programmes-SAR_VNU-HCM-7.10.2020.docx.docx?alt=media&token=295f6936-fec3-4020-8bf9-27fec74ba297', { responseType: 'arraybuffer' })
+        .then(response => {
+          mammoth.extractRawText({ arrayBuffer: response.data })
+            .then((result) => {
+              setData(result.value)
+            })
+            .catch((error) => {
+              console.error('Error extracting text from DOCX:', error);
+            });
+      })
+    }
+    else if (templateValue === ttdn) {
+      axios.get('https://firebasestorage.googleapis.com/v0/b/reportmanagementweb-409108.appspot.com/o/M%E1%BA%ABu%20b%C3%A1o%20c%C3%A1o%20th%E1%BB%B1c%20t%E1%BA%ADp.docx?alt=media&token=40f0e140-47e8-4f87-85d4-58c6340b97a7', { responseType: 'arraybuffer' })
+        .then(response => {
+          mammoth.convertToHtml({ arrayBuffer: response.data })
+            .then((result) => {
+              setData(result.value)
+            })
+            .catch((error) => {
+              console.error('Error extracting text from DOCX:', error);
+            });
+      })
+    }
+    else {
+      axios.get('https://firebasestorage.googleapis.com/v0/b/reportmanagementweb-409108.appspot.com/o/uit_phu_luc_3_mau_bao_cao.docx.docx?alt=media&token=f20ae533-2583-4135-8af6-f04899b5d7fe', { responseType: 'arraybuffer' })
+        .then(response => {
+          mammoth.extractRawText({ arrayBuffer: response.data })
+            .then((result) => {
+              setData(result.value)
+            })
+            .catch((error) => {
+              console.error('Error extracting text from DOCX:', error);
+            });
+      })
+    }
+
     setChooseTemplate(!chooseTemplate)
   }
 
@@ -313,7 +354,7 @@ const TextEditor = () => {
     else {
       axios.get(state.url, { responseType: 'arraybuffer' })
         .then(response => {
-          console.log('response:', response.data)
+          // console.log('response:', response.data)
 
           if (state.upload === true) {
             mammoth.convertToHtml({ arrayBuffer: response.data })
@@ -457,7 +498,7 @@ const TextEditor = () => {
           <Button onClick={handleClearSelection} className='resetPasswordBtn' style={{ width: 200, border: 'none' }} disabled={templateValue === null ? true : false}>
             Clear Selection
           </Button>
-          <Button className='resetPasswordBtn' style={{ width: 200, border: 'none' }} disabled={templateValue === null ? true : false}>
+          <Button className='resetPasswordBtn' style={{ width: 200, border: 'none' }} disabled={templateValue === null ? true : false} onClick={handleSelectTemplate}>
             Select
           </Button>
         </div>
