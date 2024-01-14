@@ -11,7 +11,7 @@
     /* Chiều rộng của sidebar, bạn có thể thay đổi theo nhu cầu */
     margin-top: 60px;
     border-right: 1px solid #ddd;
-    z-index: 100;
+    z-index: 1;
 }
 
 .newBtnContainer {
@@ -117,7 +117,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 999 !important;
     background: rgba(0, 0, 0, 0.4) !important;
     width: 100%;
     height: 100%;

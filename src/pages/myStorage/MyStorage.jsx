@@ -15,8 +15,6 @@ const MyStorage = () => {
   const { folder, childFolders, childFiles } = useFolder(folderId, state === null ? null : state.folder)
   // const { folder, childFolders, childFiles } = useFolder(folderId, state.folder)
 
-  // console.log(state)
-
   const dispatch = useDispatch()
 
   useEffect(() => {

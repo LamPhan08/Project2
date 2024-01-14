@@ -201,7 +201,7 @@ const Sidebar = () => {
 
         setLoadingCursor(true)
 
-        const content = "123456"
+        const content = ""
 
         const doc = new Document({
             sections: [

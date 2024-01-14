@@ -1,0 +1,12 @@
+.searchItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.searchItem:hover {
+    background-color: #c2e7ff;
+    transition: 0.3s;
+}

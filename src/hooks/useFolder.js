@@ -9,6 +9,8 @@ const ACTIONS = {
     SET_CHILD_FILES: "set-child-files",
     SET_REMOVED_FILES: "set-removed-files",
     SET_REMOVED_FOLDERS: "set-removed-folders",
+    SET_ALL_FILES: "set-all-files",
+    SET_ALL_FOLDERS: "set-all-folders",
 }
 
 const reducer = (state, { type, payload }) => {
@@ -51,6 +53,18 @@ const reducer = (state, { type, payload }) => {
                 removedFolders: payload.removedFolders
             }
         }
+        case ACTIONS.SET_ALL_FILES: {
+            return {
+                ...state,
+                allFiles: payload.allFiles
+            }
+        }
+        case ACTIONS.SET_ALL_FOLDERS: {
+            return {
+                ...state,
+                allFolders: payload.allFolders
+            }
+        }
         default: {
             return state
         }
@@ -67,6 +81,8 @@ export const useFolder = (folderId = null, folder = null) => {
         childFiles: [],
         removedFolders: [],
         removedFiles: [],
+        allFiles: [],
+        allFolders: []
     })
 
     const {currentUser} = useAuth()
@@ -151,6 +167,30 @@ export const useFolder = (folderId = null, folder = null) => {
               dispatch({
                 type: ACTIONS.SET_REMOVED_FILES,
                 payload: { removedFiles: snapshot.docs.map(database.formatDoc) },
+              })
+            })
+        )
+      }, [currentUser])
+      useEffect(() => {
+        return (
+          database.files
+            .where("userId", "==", currentUser.uid)
+            .onSnapshot(snapshot => {
+              dispatch({
+                type: ACTIONS.SET_ALL_FILES,
+                payload: { allFiles: snapshot.docs.map(database.formatDoc) },
+              })
+            })
+        )
+      }, [currentUser])
+      useEffect(() => {
+        return (
+          database.folders
+            .where("userId", "==", currentUser.uid)
+            .onSnapshot(snapshot => {
+              dispatch({
+                type: ACTIONS.SET_ALL_FOLDERS,
+                payload: { allFolders: snapshot.docs.map(database.formatDoc) },
               })
             })
         )

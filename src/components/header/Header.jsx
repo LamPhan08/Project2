@@ -7,12 +7,17 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useFolder } from '../../hooks/useFolder';
+import SearchItemCard from '../searchItemCard/SearchItemCard';
 
 const Header = () => {
+  const {allFiles, allFolders} = useFolder()
+  const [searchText, setSearchText] = useState('')
   const [openMenu, setOpenMenu] = useState(false)
   const {currentUser, logout} = useAuth()
   const navigate = useNavigate()
   const {pathname} = useLocation()
+
 
   const handleOpenMenu = () => {
     setOpenMenu(!openMenu)
@@ -23,6 +28,7 @@ const Header = () => {
 
     navigate('/login')
   }
+
 
   return (
     <div className="header">
@@ -36,8 +42,23 @@ const Header = () => {
         <div className="searchBar">
           <SearchIcon className='icon' fontSize='medium'/>
 
-          <input type="text" placeholder='Search in Reporto...' />
+          <input type="text" placeholder='Search in Reporto...' value={searchText} onChange={e => setSearchText(e.target.value)}/>
         </div>
+
+        {searchText !== '' &&
+          <div className='searchItemsWrapper'>
+            {allFiles?.filter(childFile => childFile.name.toLowerCase().includes(searchText.toLowerCase())).map((file) => {
+              return (
+                <SearchItemCard key={file.id} file={file} setSearchText={setSearchText}/>
+              )
+            })}
+            {allFolders?.filter(childFolder => childFolder.name.toLowerCase().includes(searchText.toLowerCase())).map((folder) => {
+              return (
+                <SearchItemCard key={folder.id} folder={folder} setSearchText={setSearchText}/>
+              )
+            })}
+          </div>
+        }
       </div>}
 
       <div className="avatarContainer" onClick={() => handleOpenMenu()}>
