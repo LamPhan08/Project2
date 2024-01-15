@@ -13,8 +13,10 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useNavigate } from 'react-router-dom'
 import { database } from '../../firebase/firebase';
+import axios from 'axios'
+import mammoth from 'mammoth'
 
-const File = ({ file }) => {
+const FileCard = ({ file }) => {
   const navigate = useNavigate()
   const [viewImage, setViewImage] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
@@ -42,7 +44,7 @@ const File = ({ file }) => {
       }
 
       case 'image/jpeg': {
-        return <img alt='' src={file.url} className={`${className} image`}/>
+        return <img alt='' src={file.url} className={`${className} image`} />
       }
 
       case 'text/plain': {
@@ -85,7 +87,7 @@ const File = ({ file }) => {
       .catch((error) => {
         console.error('Error removing document: ', error);
       });
-    
+
     database.removedFiles.doc(file.id).set({
       name: file.name,
       type: file.type,
@@ -103,26 +105,97 @@ const File = ({ file }) => {
   }
 
   const handleDownloadFile = async () => {
-    try {
-      const response = await fetch(file.url)
+    if (file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' && file.type !== 'application/msword') {
+      try {
+        const response = await fetch(file.url)
 
-      const blob = await response.blob();
+        const blob = await response.blob();
 
-      const blobUrl = URL.createObjectURL(blob);
+        const blobUrl = URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = file.name
-      
-      document.body.appendChild(link);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = file.name
 
-      link.click();
+        document.body.appendChild(link);
 
-      document.body.removeChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+      }
+      catch (err) {
+        console.error('Error downloading file:', err);
+      }
     }
-    catch (err) {
-      console.error('Error downloading file:', err);
-    } 
+    else {
+      if (file.upload === true) {
+        console.log(file.upload)
+        try {
+          const response = await fetch(file.url)
+  
+          const blob = await response.blob();
+  
+          const blobUrl = URL.createObjectURL(blob);
+  
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = file.name
+  
+          document.body.appendChild(link);
+  
+          link.click();
+  
+          document.body.removeChild(link);
+        }
+        catch (err) {
+          console.error('Error downloading file:', err);
+        }
+      }
+      else {
+        console.log(file.url)
+        axios.get(file.url, { responseType: 'arraybuffer' })
+        .then(response => {
+          // console.log('response:', response.data)
+
+          mammoth.extractRawText({ arrayBuffer: response.data })
+          .then((result) => {
+            const blob = new Blob([result.value], {
+              type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            });
+
+            const newFile = new File([blob], file.name, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+
+            // Specify link url
+            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(result.value);
+
+            // Specify file name
+
+            // Create download link element
+            const downloadLink = document.createElement("a");
+
+            document.body.appendChild(downloadLink);
+
+            if (navigator.msSaveOrOpenBlob) {
+              navigator.msSaveOrOpenBlob(newFile, file.name);
+            } else {
+              // Create a link to the file
+              downloadLink.href = url;
+
+              // Setting the file name
+              downloadLink.download = file.name + '.doc';
+
+              //triggering the function
+              downloadLink.click();
+            }
+
+            document.body.removeChild(downloadLink);
+          })
+          .catch((error) => {
+            console.error('Error extracting text from DOCX:', error);
+          });
+        })
+      }
+    }
 
     setShowMenu(!showMenu)
   }
@@ -221,4 +294,4 @@ const File = ({ file }) => {
   }
 }
 
-export default File
+export default FileCard

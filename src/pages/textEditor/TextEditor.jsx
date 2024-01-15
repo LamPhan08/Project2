@@ -21,7 +21,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ROOT_FOLDER } from '../../hooks/useFolder';
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
-
 const buttons = [
   "undo",
   "redo",
@@ -251,27 +250,61 @@ const TextEditor = () => {
       alert('Vui lòng nhấn lưu trước khi tải xuống!')
     }
     else {
-      try {
-        const response = await fetch(fileUrl)
+      // try {
+      //   const response = await fetch(fileUrl)
 
-        const blob = await response.blob();
+      //   const blob = await response.blob();
 
-        const blobUrl = URL.createObjectURL(blob);
+      //   const blobUrl = URL.createObjectURL(blob);
 
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = state.name
+      //   const link = document.createElement('a');
+      //   link.href = blobUrl;
+      //   link.download = state.name
 
-        document.body.appendChild(link);
+      //   document.body.appendChild(link);
 
-        link.click();
+      //   link.click();
 
-        document.body.removeChild(link);
-      }
-      catch (err) {
-        console.error('Error downloading file:', err);
-      }
+      //   document.body.removeChild(link);
+      // }
+      // catch (err) {
+      //   console.error('Error downloading file:', err);
+      // }
+
+      // const blob = new Blob([data], {
+      //   type: 'application/msword'
+      // });
+
+      // const file = new File([blob], state.name, { type: 'application/msword' })
+
+      // // Specify link url
+      // const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(data);
+
+      // // Specify file name
+
+      // // Create download link element
+      // const downloadLink = document.createElement("a");
+
+      // document.body.appendChild(downloadLink);
+
+      // if (navigator.msSaveOrOpenBlob) {
+      //   navigator.msSaveOrOpenBlob(file, state.name);
+      // } else {
+      //   // Create a link to the file
+      //   downloadLink.href = url;
+
+      //   // Setting the file name
+      //   downloadLink.download = state.name + '.doc';
+
+      //   //triggering the function
+      //   downloadLink.click();
+      // }
+
+      // document.body.removeChild(downloadLink);
+
+      
     }
+    
   }
 
   const handleClearSelection = () => {
@@ -458,7 +491,7 @@ const TextEditor = () => {
               <div style={{ textAlign: 'center', fontWeight: 500 }}>Self Assessment Report</div>
             </div>
 
-            <div>
+            {/* <div>
               <label style={{ cursor: 'pointer', border: templateValue === ttdn ? '3px solid #FF9600' : '3px solid grey' }} >
                 <input
                   type='radio'
@@ -472,7 +505,7 @@ const TextEditor = () => {
               </label>
 
               <div style={{ textAlign: 'center', fontWeight: 500 }}>Corporate Internship Report</div>
-            </div>
+            </div> */}
 
             <div>
               <label style={{ cursor: 'pointer', border: templateValue === kltn ? '3px solid #FF9600' : '3px solid grey' }} >
