@@ -6,7 +6,7 @@ import nothing from '../../assets/images/nothing.png'
 import RemovedFile from '../../components/removedFile/RemovedFile'
 
 const Trash = () => {
-  const { removedFiles, removedFolders, childFiles } = useFolder(null, null)
+  const { removedFiles, removedFolders } = useFolder(null, null)
 
   console.log(removedFolders?.length)
 
@@ -16,7 +16,7 @@ const Trash = () => {
 
       {removedFolders?.length === 0 && removedFiles?.length === 0
         && <div className='nothingWrapper'>
-          <img src={nothing} className='nothingImg' />
+          <img src={nothing} className='nothingImg' alt=''/>
           There's nothing here!
         </div>
       }

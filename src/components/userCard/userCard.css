@@ -1,0 +1,16 @@
+.shareBtn {
+    border-radius: 8px;
+    background-color: #89c6ee;
+    border: none;
+    color: #fff;
+    padding: 0 5px;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 2px 5px;
+}
+    
+/* .shareBtn:hover {
+    background-color: #61b5ec;
+    transition: 0.3s;
+    border: none;
+} */

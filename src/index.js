@@ -6,6 +6,9 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
 import { store } from './redux/store';
 import { Provider } from 'react-redux';
+import {registerLicense} from '@syncfusion/ej2-base'
+
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NAaF5cWWJCfEx3Qnxbf1x0ZFZMZVVbRndPMyBoS35RckViWHdccnVcQ2JeVkd/');
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

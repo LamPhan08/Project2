@@ -11,15 +11,18 @@ import image from '../../assets/images/image.png'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import { useNavigate } from 'react-router-dom'
 import { database } from '../../firebase/firebase';
 import axios from 'axios'
 import mammoth from 'mammoth'
+import ModalShareUser from '../modalShareUser/ModalShareUser'
 
 const FileCard = ({ file }) => {
   const navigate = useNavigate()
   const [viewImage, setViewImage] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
 
   const getFileImage = (className) => {
     switch (file.type) {
@@ -200,6 +203,12 @@ const FileCard = ({ file }) => {
     setShowMenu(!showMenu)
   }
 
+  const handleShareFile = () => {
+    setOpenModal(true)
+    
+    setShowMenu(!showMenu)
+  }
+
 
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     || file.type === 'text/plain'
@@ -231,6 +240,9 @@ const FileCard = ({ file }) => {
           </div>
         </div>
 
+        <ModalShareUser isOpen={openModal} setIsOpen={setOpenModal} file={file}/>
+        
+
         {viewImage &&
           <div className='popupImage'>
             <span onClick={handleViewImage}>&times;</span>
@@ -240,10 +252,16 @@ const FileCard = ({ file }) => {
         }
 
         <div className={`fileMenu ${showMenu ? 'fileMenuActive' : 'fileMenuInactive'}`}>
-          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleDownloadFile}>
+          {/* <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleDownloadFile}>
             <FileDownloadIcon />
 
             Download File
+          </div> */}
+
+          <div className='menuItem' style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }} onClick={handleShareFile}>
+            <PersonAddAlt1Icon />
+
+            Share
           </div>
 
           <div className='menuItem' style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }} onClick={handleDeleteFile}>
@@ -251,6 +269,7 @@ const FileCard = ({ file }) => {
 
             Move to Trash
           </div>
+
         </div>
       </div>
     )

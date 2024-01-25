@@ -11,17 +11,20 @@ const firebaseConfig = {
   messagingSenderId: "428150027554",
   appId: "1:428150027554:web:f1d7bf4e26dfe694fc617b",
   measurementId: "G-PH5CN69YDZ"
-};
+}
 
-const app = firebase.initializeApp(firebaseConfig)
+export const app = firebase.initializeApp(firebaseConfig)
 // const analytics = getAnalytics(app)
+
 
 const firestore = app.firestore()
 export const database = {
+  users: firestore.collection("users"),
   folders: firestore.collection("folders"),
   files: firestore.collection("files"),
   removedFolders: firestore.collection('removedFolders'),
   removedFiles: firestore.collection('removedFiles'),
+  sharedFiles: firestore.collection('sharedFiles'),
   formatDoc: doc => {
     return {
       id: doc.id,

@@ -25,10 +25,10 @@ const menuItem = [
         title: "New Folder",
         icon: CreateNewFolderIcon
     },
-    {
-        title: "Upload File",
-        icon: UploadFileIcon
-    },
+    // {
+    //     title: "Upload File",
+    //     icon: UploadFileIcon
+    // },
     // {
     //     title: "Upload Folder",
     //     icon: DriveFolderUploadIcon
@@ -259,6 +259,7 @@ const Sidebar = () => {
                                 const newFileId = newFileRef.id
 
                                 newFileRef.set({
+                                    id: newFileRef.id,
                                     url: url,
                                     name: name,
                                     type: file.type,

@@ -7,6 +7,7 @@ import Register from '../pages/register/Register'
 import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import { useAuth } from '../contexts/AuthContext'
 import TextEditor from '../pages/textEditor/TextEditor'
+import SharedWithMe from '../pages/sharedWithMe/SharedWithMe'
 
 const Routers = () => {
   const {currentUser} = useAuth()
@@ -21,6 +22,7 @@ const Routers = () => {
       <Route path='/register' element={<Register/>}/>
       <Route path='/forgot-password' element={<ForgotPassword/>}/>
       <Route path='/text-editor' element={<TextEditor/>}/>
+      <Route path='/sharedwithme' element={<SharedWithMe/>}/>
     </Routes>
   )
 }
